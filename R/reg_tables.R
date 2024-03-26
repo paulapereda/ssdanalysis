@@ -1,8 +1,8 @@
-reg_tables <- function(data, time, module, path = here::here()) {
+reg_tables <- function(data, sample, module, path = here::here()) {
 
   set.seed(61625)
 
-  # Define modules and their respective variables inside the function
+  # Defining modules and their respective variables inside the function
   modules <- list(
 
     food_security      = c("food_cons_score_w",       "fcs_profile1",           "fcs_profile2",
@@ -59,62 +59,49 @@ reg_tables <- function(data, time, module, path = here::here()) {
   # Retrieve the variables for the specified module
   variables <- modules[[module]]
 
-  # Specify LASSO variables common for HF or END(line)
+  # Specify LASSO variables
 
-  if (time == "FULL") {
+  lasso_vars <- c(  "sex_hhh_imp",                   "age_hhh_imp", # HH CHARACTERISTICS
+                    "adult_total",
 
-    lasso_vars  <- c( "sex_hhh_imp",              "age_hhh_imp",        # HH CHARACTERISTICS
+                    "adult_empl_imp",                "wage_job_any_imp", # WAGE LABOUR/EMPLOYMENT
 
-                      "hh_own_bus_imp",           "business_count_imp", # BUSINESS
-                      "ent_profit_w_all_imp",
+                    "hh_own_bus_imp",                "business_count_imp",#BUSINESS
+                    "ent_profit_w_all_imp",
 
-                      "hh_chicken_all_imp",       "hh_goat_all_imp",    # AGRICULTURE
-                      "livestock_sold_all_imp",   "lstock_cons_all_imp",
-                      "lstock_turnover_all_imp",  "wet_crop_imp",
-                      "dry_crop_imp",
+                    "hasplots_imp",                  "wet_crop_imp", #AGRICULTURE
+                    "dry_crop_imp",
 
-                      "food_cons_score_w_imp",    "fies_score_imp"      # FOOD SECURITY
-    )
+                    "own_livestock",                 "hh_chicken_all_imp",       # LIVESTOCK
+                    "hh_goat_all_imp",               "livestock_sold_all_imp",
+                    "lstock_cons_all_imp",           "lstock_turnover_all_imp",
+
+                    "food_cons_score_w_imp",         "fies_score_imp", # FOOD SECURITY
+
+                    "hh_assets_own_imp",             "hh_assets_tot_imp",  # ASSETS
+                    "farm_assets_tot_imp",           "farm_assets_own_imp",
+                    "both_assets_own_imp",           "asset_group_imp",
+
+                    "ps_depression_cesd_imp",        "ps_depression_sqr_imp", # PSYCHOSOCIAL
+
+                    "shock_group_1_imp",             "shock_group_2_imp", # SHOCKS
+                    "shock_group_3_imp",             "shock_group_4_imp",
+                    "shock_group_5_imp",             "shock_group_6_imp",
+                    "shock_group_7_imp",             "shock_group_8_imp",
+                    "tot_shocks_imp",                "avg_shocks_imp",
+
+                    "tot_food_exp_month_wins_imp",   "food_exp_pc_w_imp",  # CONSUMPTION EXPENDITURE
+                    "tot_nfood_exp_month_wins_imp",  "nfood_exp_pc_w_imp",
+                    "tot_exp_month_wins_imp",        "tot_exp_month_pc_wins_imp",
+                    "fes_imp",                       "avg_bot_unit_price_imp"
+  )
+
+  if (sample == "FULL") {
 
     df            <- data %>%
       filter(round_pooled != 0)
 
-  } else if (time == "END") {
-
-    lasso_vars <- c(  "sex_hhh_imp",                   "age_hhh_imp", # HH CHARACTERISTICS
-                      "adult_total",
-
-                      "adult_empl_imp",                "wage_job_any_imp", # WAGE LABOUR/EMPLOYMENT
-
-                      "hh_own_bus_imp",                "business_count_imp",#BUSINESS
-                      "ent_profit_w_all_imp",
-
-                      "hasplots_imp",                  "wet_crop_imp", #AGRICULTURE
-                      "dry_crop_imp",
-
-                      "own_livestock",                 "hh_chicken_all_imp",       # LIVESTOCK
-                      "hh_goat_all_imp",               "livestock_sold_all_imp",
-                      "lstock_cons_all_imp",           "lstock_turnover_all_imp",
-
-                      "food_cons_score_w_imp",         "fies_score_imp", # FOOD SECURITY
-
-                      "hh_assets_own_imp",             "hh_assets_tot_imp",  # ASSETS
-                      "farm_assets_tot_imp",           "farm_assets_own_imp",
-                      "both_assets_own_imp",           "asset_group_imp",
-
-                      "ps_depression_cesd_imp",        "ps_depression_sqr_imp", # PSYCHOSOCIAL
-
-                      "shock_group_1_imp",             "shock_group_2_imp", # SHOCKS
-                      "shock_group_3_imp",             "shock_group_4_imp",
-                      "shock_group_5_imp",             "shock_group_6_imp",
-                      "shock_group_7_imp",             "shock_group_8_imp",
-                      "tot_shocks_imp",                "avg_shocks_imp",
-
-                      "tot_food_exp_month_wins_imp",   "food_exp_pc_w_imp",  # CONSUMPTION EXPENDITURE
-                      "tot_nfood_exp_month_wins_imp",  "nfood_exp_pc_w_imp",
-                      "tot_exp_month_wins_imp",        "tot_exp_month_pc_wins_imp",
-                      "fes_imp",                       "avg_bot_unit_price_imp"
-    )
+  } else if (sample == "END") {
 
     df            <- data %>%
       filter(round_pooled == 11)
@@ -183,7 +170,7 @@ reg_tables <- function(data, time, module, path = here::here()) {
     variables_all <- toString(variables)
     controls      <- ifelse(variables_all == "", "", controls)
 
-    if (time == "FULL") {
+    if (sample == "FULL") {
 
       reg1 <- felm(as.formula(paste(outcome, "~ treatment", " | level1 + round_cont | 0 | level4")), data = df)
       reg2 <- felm(as.formula(paste(outcome, "~ treatment", control, " | level1 + round_cont | 0 | level4 + hhid")), data = df)
@@ -192,7 +179,7 @@ reg_tables <- function(data, time, module, path = here::here()) {
       reg5 <- felm(as.formula(paste(outcome, "~ treat_uct + treat_ffa", control, " | level1 + round_cont | 0 | level4 + hhid")), data = df)
       reg6 <- felm(as.formula(paste(outcome, "~ treat_uct + treat_ffa", control, controls, " | level1 + round_cont | 0 | level4 + hhid")), data = df)
 
-    } else if (time == "END") {
+    } else if (sample == "END") {
 
       # Now, we can run the regression with the selected lasso controls
       reg1 <- felm(as.formula(paste(outcome, "~ treatment", " | level1 + round_cont | 0 | level4")), data = df)
