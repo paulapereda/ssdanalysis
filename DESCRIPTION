@@ -9,8 +9,7 @@ Description: Data analysis functions for the Impact Evaluation of WFP Resilience
 License: MIT
 BugReports: https://github.com/paulapereda/ssdanalysis/issues
 Depends: 
-    R (>= 3.6)
-Imports: 
+    R (>= 3.6),
     broom,
     ggtext,
     glmnet,
