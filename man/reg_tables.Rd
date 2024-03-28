@@ -18,7 +18,7 @@
 
 \description{
 Purpose: create tables for target indicators of an impact evaluation in South Sudan.
-The regression includes controls for outcomes at baseline and additional controls selected using a Double Lasso Selection.
+The regression includes controls for outcomes at baseline and additional controls selected using Double Lasso Selection.
 NOTE: in our impact evaluation, estimates were standardized relative to the mean and standard deviation values
 for the control group.
 }

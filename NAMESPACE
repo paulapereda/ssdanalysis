@@ -1,1 +1,2 @@
 export(reg_tables)
+export(coef_plot)

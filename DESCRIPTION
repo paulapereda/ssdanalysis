@@ -12,9 +12,12 @@ Depends:
     R (>= 3.6)
 Imports: 
     broom,
+    ggtext,
     glmnet,
+    glue,
     here,
     lfe,
+    RColorBrewer,
     stargazer,
     tidyverse
 Encoding: UTF-8
