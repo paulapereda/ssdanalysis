@@ -1,4 +1,4 @@
-reg_coef_plots <- function(data, sample, module, path = here::here()) {
+coef_plot <- function(data, sample, module, path = here::here()) {
 
   set.seed(61625)
 
